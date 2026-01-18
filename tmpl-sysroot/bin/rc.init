@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo " --- \e[92mslinux\e[0m --- "
+
+hostname $(cat /etc/hostname)
+
+# exec login < /dev/tty1 > /dev/tty1 2>&1
+
+exec getty < /dev/tty1 > /dev/tty1 2>&1
