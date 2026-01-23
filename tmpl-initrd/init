@@ -1,23 +1,34 @@
 #!/bin/sh
+echo "initrd: alive"
 
 echo "-- mount /dev"
-/bin/mount -t devtmpfs none /dev
+mount -t devtmpfs none /dev
+echo "-- mount /proc"
+mount -t devtmpfs none /proc
 
-echo "initrd: alive"
+for arg in "$(cat /proc/cmdline)"; do
+	case "$arg" in
+		root=*)
+			root="${arg#root=}"
+			;;
+		init=*)
+			init="${arg#init=}"
+			;;
+	esac
+done
 
 echo "-- mkdir /mnt"
 mkdir /mnt
+
 echo "-- mount /mnt"
-mount -t iso9660 -o ro /dev/sr0 /mnt
+mount -t iso9660 -o ro ${init:-/dev/sr0} /mnt
 
 echo "-- mount /mnt/proc"
-/bin/mount -t proc proc /mnt/proc
-
+mount -t proc proc /mnt/proc
 echo "-- mount /mnt/sys"
-/bin/mount -t sysfs none /mnt/sys
-
+mount -t sysfs none /mnt/sys
 echo "-- mount /mnt/dev"
-/bin/mount -t devtmpfs none /mnt/dev
+mount -t devtmpfs none /mnt/dev
 
 echo "-- running switch_root"
-exec /bin/switch_root -c /dev/tty1 /mnt /bin/sinit
+exec switch_root /mnt ${init:-/bin/sinit}
