@@ -24,7 +24,7 @@ fi
 
 if [ ! -d "$INITRD" ]; then
 	echo "INITRD does not exist, creating"
-	mkdir -p $INITRD/bin
+	mkdir -p $INITRD/{dev,proc,mnt}
 	cp -r tmpl-initrd/* $INITRD
 fi
 
@@ -84,7 +84,7 @@ if [ ! -d "sbase" ]; then
 	cd ..
 fi
 
-if [ ! -f "$SYSROOT/bin/ls" ]; then
+if [ ! -f "$SYSROOT/usr/bin/ls" ]; then
 	echo "SYSROOT sbase utils do not exist, installing"
 	cd sbase
 	rm -f proto
@@ -92,7 +92,7 @@ if [ ! -f "$SYSROOT/bin/ls" ]; then
 	cd ..
 fi
 
-if [ ! -f "$INITRD/bin/ls" ]; then
+if [ ! -f "$INITRD/usr/bin/ls" ]; then
 	echo "INITRD sbase utils do not exist, installing"
 	cd sbase
 	rm -f proto
@@ -110,7 +110,7 @@ if [ ! -d "ubase" ]; then
 	cd ..
 fi
 
-if [ ! -f "$SYSROOT/bin/mount" ]; then
+if [ ! -f "$SYSROOT/usr/bin/mount" ]; then
 	echo "SYSROOT ubase utils do not exist, installing"
 	cd ubase
 	rm -f proto
@@ -118,7 +118,7 @@ if [ ! -f "$SYSROOT/bin/mount" ]; then
 	cd ..
 fi
 
-if [ ! -f "$INITRD/bin/mount" ]; then
+if [ ! -f "$INITRD/usr/bin/mount" ]; then
 	echo "INITRD ubase utils do not exist, installing"
 	cd ubase
 	rm -f proto
@@ -136,7 +136,7 @@ if [ ! -d "sinit" ]; then
 	cd ..
 fi
 
-if [ ! -f "$SYSROOT/bin/sinit" ]; then
+if [ ! -f "$SYSROOT/usr/bin/sinit" ]; then
 	echo "SYSROOT sinit does not exist, installing"
 	cd sinit
 	make install DESTDIR=$SYSROOT
@@ -155,14 +155,14 @@ if [ ! -d "dash-$DASH_VERSION" ]; then
 	cd ..
 fi
 
-if [ ! -f "$SYSROOT/bin/sh" ]; then
-	echo "SYSROOT/bin/sh does not exist, copying dash"
-	cp -v dash-$DASH_VERSION/src/dash $SYSROOT/bin/sh
+if [ ! -f "$SYSROOT/usr/bin/sh" ]; then
+	echo "SYSROOT/usr/bin/sh does not exist, copying dash"
+	cp -v dash-$DASH_VERSION/src/dash $SYSROOT/usr/bin/sh
 fi
 
-if [ ! -f "$INITRD/bin/sh" ]; then
-	echo "INITRD/bin/sh does not exist, copying dash"
-	cp -v dash-$DASH_VERSION/src/dash $INITRD/bin/sh
+if [ ! -f "$INITRD/usr/bin/sh" ]; then
+	echo "INITRD/usr/bin/sh does not exist, copying dash"
+	cp -v dash-$DASH_VERSION/src/dash $INITRD/usr/bin/sh
 fi
 
 # bash
@@ -176,16 +176,16 @@ if [ ! -d "bash-$BASH_VERSION" ]; then
 	cd ..
 fi
 
-if [ ! -f "$SYSROOT/bin/bash" ]; then
-	echo "SYSROOT/bin/bash does not exist, copying bash"
-	cp -v bash-$BASH_VERSION/bash $SYSROOT/bin/bash
+if [ ! -f "$SYSROOT/usr/bin/bash" ]; then
+	echo "SYSROOT/usr/bin/bash does not exist, copying bash"
+	cp -v bash-$BASH_VERSION/bash $SYSROOT/usr/bin/bash
 fi
 
 # neofetch
-if [ ! -f "$SYSROOT/bin/neofetch" ]; then
-	echo "SYSROOT/bin/neofetch does not exist, downloading"
-	wget https://raw.githubusercontent.com/dylanaraps/neofetch/refs/heads/master/neofetch -O $SYSROOT/bin/neofetch
-	chmod +x $SYSROOT/bin/neofetch
+if [ ! -f "$SYSROOT/usr/bin/neofetch" ]; then
+	echo "SYSROOT/usr/bin/neofetch does not exist, downloading"
+	wget https://raw.githubusercontent.com/dylanaraps/neofetch/refs/heads/master/neofetch -O $SYSROOT/usr/bin/neofetch
+	chmod +x $SYSROOT/usr/bin/neofetch
 fi
 
 # nuke stuff in initrd

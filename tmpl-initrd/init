@@ -11,17 +11,17 @@ for arg in "$(cat /proc/cmdline)"; do
 		root=*)
 			root="${arg#root=}"
 			;;
+		rootfstype=*)
+			rootfstype="${arg#rootfstype=}"
+			;;
 		init=*)
 			init="${arg#init=}"
 			;;
 	esac
 done
 
-echo "-- mkdir /mnt"
-mkdir /mnt
-
 echo "-- mount /mnt"
-mount -t iso9660 -o ro ${init:-/dev/sr0} /mnt
+mount -t ${rootfstype:-iso9660} -o ro ${root:-/dev/sr0} /mnt
 
 echo "-- mount /mnt/proc"
 mount -t proc proc /mnt/proc
