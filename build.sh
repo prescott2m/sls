@@ -1,24 +1,8 @@
 #!/bin/bash
 set -e
 
-sl_var() {
-  printf -v "$1" '%s' "$2"
-  export "$1"
-  printf '%s=\e[94m%s\e[0m\n' "$1" "${!1}"
-}
+. config.sh
 
-sl_log() {
-	echo -e "- \e[94m$*\e[0m"
-}
-
-# vars
-sl_var MUSL_VERSION 1.2.5
-sl_var DASH_VERSION 0.5.13
-sl_var BASH_VERSION 5.3
-sl_var TARGET_TUPLE x86_64-linux-musl
-sl_var SYSROOT "$(pwd)/sysroot"
-sl_var INITRD "$(pwd)/initrd"
-sl_var BASE "$(pwd)"
 echo "---"
 
 # make sure dirs exist
@@ -30,7 +14,7 @@ fi
 
 if [ ! -d "$INITRD" ]; then
 	sl_log "INITRD does not exist, creating"
-	mkdir -p $INITRD/{dev,proc,mnt,mnt/dev,mnt/proc,mnt/sys}
+	mkdir -p $INITRD/{dev,proc,tmp,mnt}
 	cp -r tmpl-initrd/* $INITRD
 fi
 
@@ -169,29 +153,6 @@ fi
 if [ ! -f "$INITRD/usr/bin/sh" ]; then
 	sl_log "INITRD/usr/bin/sh does not exist, copying dash"
 	cp -v dash-$DASH_VERSION/src/dash $INITRD/usr/bin/sh
-fi
-
-# bash
-if [ ! -d "bash-$BASH_VERSION" ]; then
-	sl_log "./bash-$BASH_VERSION does not exist, downloading and building"
-	wget https://ftp.gnu.org/gnu/bash/bash-$BASH_VERSION.tar.gz
-	tar -xzvf bash-$BASH_VERSION.tar.gz
-	cd bash-$BASH_VERSION
-	./configure --host=x86_64-linux-musl --without-bash-malloc
-	make -j$(nproc)
-	cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/usr/bin/bash" ]; then
-	sl_log "SYSROOT/usr/bin/bash does not exist, copying bash"
-	cp -v bash-$BASH_VERSION/bash $SYSROOT/usr/bin/bash
-fi
-
-# neofetch
-if [ ! -f "$SYSROOT/usr/bin/neofetch" ]; then
-	sl_log "SYSROOT/usr/bin/neofetch does not exist, downloading"
-	wget https://raw.githubusercontent.com/dylanaraps/neofetch/refs/heads/master/neofetch -O $SYSROOT/usr/bin/neofetch
-	chmod +x $SYSROOT/usr/bin/neofetch
 fi
 
 # nuke stuff in initrd

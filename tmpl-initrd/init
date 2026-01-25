@@ -12,8 +12,8 @@ mount -t proc proc /proc
 
 for arg in $(cat /proc/cmdline); do
 	case "$arg" in
-		root=*)
-			root="${arg#root=}"
+		rootdisk=*)
+			rootdisk="${arg#root=}"
 			;;
 		rootfstype=*)
 			rootfstype="${arg#rootfstype=}"
@@ -25,14 +25,33 @@ for arg in $(cat /proc/cmdline); do
 done
 
 sl_log "mount /mnt"
-mount -t ${rootfstype:-iso9660} -o ro ${root:-/dev/sr0} /mnt
+mount -t ${rootfstype:-iso9660} -o ro ${rootdisk:-/dev/sr0} /mnt
 
-sl_log "mount /mnt/proc"
-mount -t proc proc /mnt/proc
-sl_log "mount /mnt/sys"
-mount -t sysfs sysfs /mnt/sys
-sl_log "mount /mnt/dev"
-mount -t devtmpfs none /mnt/dev
+if grep -qw ro /proc/cmdline; then
+	# read-only disk, use /tmp
+	ROOT="/tmp"
+
+	sl_log "mount $ROOT"
+	mount -t tmpfs tmpfs $ROOT
+
+	sl_log "copy root to $ROOT"
+	cd /mnt && tar cf - . | (cd /tmp && tar xpf -) && cd /
+
+	sl_log "unmount /mnt"
+	umount /mnt
+else
+	# read-write, use the actual disk
+	ROOT="/mnt"
+	sl_log "remount /mnt as rw"
+	mount -o remount,rw /mnt
+fi
+
+sl_log "move /dev to $ROOT/dev"
+mount -M /dev $ROOT/dev
+sl_log "move /proc to $ROOT/proc"
+mount -M /proc $ROOT/proc
+sl_log "mount $ROOT/sys"
+mount -t sysfs sysfs $ROOT/sys
 
 sl_log "running switch_root"
-exec switch_root /mnt ${init:-/bin/sinit}
+exec switch_root $ROOT ${init:-/bin/sinit}
