@@ -1,12 +1,16 @@
 #!/bin/sh
 echo "initrd: alive"
 
-echo "-- mount /dev"
-mount -t devtmpfs none /dev
-echo "-- mount /proc"
-mount -t devtmpfs none /proc
+sl_log() {
+	echo "- \e[94m$*\e[0m"
+}
 
-for arg in "$(cat /proc/cmdline)"; do
+sl_log "mount /dev"
+mount -t devtmpfs none /dev
+sl_log "mount /proc"
+mount -t proc proc /proc
+
+for arg in $(cat /proc/cmdline); do
 	case "$arg" in
 		root=*)
 			root="${arg#root=}"
@@ -20,15 +24,15 @@ for arg in "$(cat /proc/cmdline)"; do
 	esac
 done
 
-echo "-- mount /mnt"
+sl_log "mount /mnt"
 mount -t ${rootfstype:-iso9660} -o ro ${root:-/dev/sr0} /mnt
 
-echo "-- mount /mnt/proc"
+sl_log "mount /mnt/proc"
 mount -t proc proc /mnt/proc
-echo "-- mount /mnt/sys"
-mount -t sysfs none /mnt/sys
-echo "-- mount /mnt/dev"
+sl_log "mount /mnt/sys"
+mount -t sysfs sysfs /mnt/sys
+sl_log "mount /mnt/dev"
 mount -t devtmpfs none /mnt/dev
 
-echo "-- running switch_root"
+sl_log "running switch_root"
 exec switch_root /mnt ${init:-/bin/sinit}
