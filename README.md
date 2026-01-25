@@ -2,9 +2,11 @@
 
 terrible linux "distro" using musl, sbase+ubase, and sinit
 
-to set up the distro and create an slinux.iso, run `build.sh`
+to configure, edit `config.sh`
 
-# software in the base system
+to build slinux and create an slinux.iso, run `build.sh`
+
+## software in the base system
 
 - sbase
 - ubase

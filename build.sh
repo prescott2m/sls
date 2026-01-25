@@ -8,13 +8,13 @@ echo "---"
 # make sure dirs exist
 if [ ! -d "$SYSROOT" ]; then
 	sl_log "SYSROOT does not exist, creating"
-	mkdir -p $SYSROOT/{dev,proc,root,sys}
+	mkdir -p $SYSROOT/{dev,proc,sys,root}
 	cp -r tmpl-sysroot/* $SYSROOT
 fi
 
 if [ ! -d "$INITRD" ]; then
 	sl_log "INITRD does not exist, creating"
-	mkdir -p $INITRD/{dev,proc,tmp,mnt}
+	mkdir -p $INITRD/{dev,proc,sys,tmp,mnt}
 	cp -r tmpl-initrd/* $INITRD
 fi
 
@@ -172,7 +172,7 @@ fi
 # boot media
 if [ ! -f "slinux.iso" ]; then
 	sl_log "slinux.iso does not exist, creating"
-	grub-mkrescue -o slinux.iso sysroot/
+	grub-mkrescue -o slinux.iso sysroot/ -- -volid slinux-iso
 fi
 
 

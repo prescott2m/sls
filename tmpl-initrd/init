@@ -5,11 +5,27 @@ sl_log() {
 	echo "- \e[94m$*\e[0m"
 }
 
+cleanup() {
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+		echo "- \e[91mcommand failed with status $exit_code\e[0m"
+		sl_log "dropping into emergency shell"
+        exec /bin/sh -i
+    fi
+}
+
+trap cleanup EXIT
+set -ue
+
+# mounts
 sl_log "mount /dev"
 mount -t devtmpfs none /dev
 sl_log "mount /proc"
 mount -t proc proc /proc
+sl_log "mount /sys"
+mount -t sysfs sysfs /sys
 
+# read params
 for arg in $(cat /proc/cmdline); do
 	case "$arg" in
 		rootdisk=*)
@@ -24,6 +40,21 @@ for arg in $(cat /proc/cmdline); do
 	esac
 done
 
+# if live, then locate the livecd (awful hack)
+if grep -qw live /proc/cmdline; then
+	while [ -z "${rootdisk:-}" ]; do
+		for dev in /sys/class/block/*; do
+			devpath="/dev/${dev##*/}"
+			if dd if=$devpath bs=1024 count=64 2>/dev/null | strings | grep -qw "slinux-iso"; then
+				sl_log "found livecd root: $devpath"
+				rootdisk=$devpath
+				break
+			fi
+		done
+	done
+fi
+
+# mount root
 sl_log "mount /mnt"
 mount -t ${rootfstype:-iso9660} -o ro ${rootdisk:-/dev/sr0} /mnt
 
@@ -46,12 +77,14 @@ else
 	mount -o remount,rw /mnt
 fi
 
+# move mountpoints
 sl_log "move /dev to $ROOT/dev"
 mount -M /dev $ROOT/dev
 sl_log "move /proc to $ROOT/proc"
 mount -M /proc $ROOT/proc
-sl_log "mount $ROOT/sys"
-mount -t sysfs sysfs $ROOT/sys
+sl_log "move /sys to $ROOT/sys"
+mount -M /sys $ROOT/sys
 
+# switch_root
 sl_log "running switch_root"
 exec switch_root $ROOT ${init:-/bin/sinit}
