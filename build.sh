@@ -133,6 +133,21 @@ if [ ! -f "$SYSROOT/usr/bin/sinit" ]; then
 	cd $BASE
 fi
 
+# rc.shutdown
+if [ ! -f "rc.shutdown/rc.shutdown" ]; then
+	sl_log "./rc.shutdown/rc.shutdown does not exist, building"
+	cd rc.shutdown
+	make
+	cd $BASE
+fi
+
+if [ ! -f "$SYSROOT/usr/bin/rc.shutdown" ]; then
+	sl_log "SYSROOT/bin/rc.shutdown does not exist, installing"
+	cd rc.shutdown
+	make install DESTDIR=$SYSROOT
+	cd $BASE
+fi
+
 # dash
 if [ ! -d "dash-$DASH_VERSION" ]; then
 	sl_log "./dash-$DASH_VERSION does not exist, cloning and building"

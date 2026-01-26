@@ -4,7 +4,7 @@ dash*
 sbase
 ubase
 sinit
-bash*
 sysroot
 initrd
 slinux.iso
+rc.shutdown/rc.shutdown

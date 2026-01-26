@@ -8,6 +8,7 @@ to build slinux and create an slinux.iso, run `build.sh`
 
 ## software in the base system
 
+- musl
 - sbase
 - ubase
 - sinit
