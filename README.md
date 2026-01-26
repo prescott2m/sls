@@ -13,3 +13,4 @@ to build slinux and create an slinux.iso, run `build.sh`
 - ubase
 - sinit
 - dash
+- oksh

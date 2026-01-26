@@ -8,7 +8,7 @@ echo "---"
 # make sure dirs exist
 if [ ! -d "$SYSROOT" ]; then
 	sl_log "SYSROOT does not exist, creating"
-	mkdir -p $SYSROOT/{dev,proc,sys,root}
+	mkdir -p $SYSROOT/{dev,proc,sys}
 	cp -r tmpl-sysroot/* $SYSROOT
 fi
 
@@ -170,6 +170,23 @@ if [ ! -f "$INITRD/usr/bin/sh" ]; then
 	cp -v dash-$DASH_VERSION/src/dash $INITRD/usr/bin/sh
 fi
 
+# oksh
+if [ ! -d "oksh-$OKSH_VERSION" ]; then
+	sl_log "./oksh-$OKSH_VERSION does not exist, cloning and building"
+	git clone https://github.com/ibara/oksh -b oksh-$OKSH_VERSION oksh-$OKSH_VERSION
+	cd oksh-$OKSH_VERSION
+	./configure --cc=musl-gcc --enable-small --enable-ksh --prefix=/usr
+	make -j$(nproc)
+	cd $BASE
+fi
+
+if [ ! -f "$SYSROOT/usr/bin/ksh" ]; then
+	sl_log "SYSROOT/usr/bin/ksh does not exist, installing"
+	cd oksh-$OKSH_VERSION
+	make install DESTDIR=$SYSROOT
+	cd $BASE
+fi
+
 # nuke stuff in initrd
 if [ -d "$INITRD/usr/share/man" ]; then
 	sl_log "nuking manpages from INITRD"
@@ -187,7 +204,7 @@ fi
 # boot media
 if [ ! -f "slinux.iso" ]; then
 	sl_log "slinux.iso does not exist, creating"
-	grub-mkrescue -o slinux.iso sysroot/ -- -volid slinux-iso
+	grub-mkrescue -o slinux.iso sysroot/ -- -volid SLINUX_ISO
 fi
 
 

@@ -28,7 +28,7 @@ mount -t sysfs sysfs /sys
 # read params
 for arg in $(cat /proc/cmdline); do
 	case "$arg" in
-		rootdisk=*)
+		root=*)
 			rootdisk="${arg#root=}"
 			;;
 		rootfstype=*)
@@ -45,13 +45,14 @@ if grep -qw live /proc/cmdline; then
 	while [ -z "${rootdisk:-}" ]; do
 		for dev in /sys/class/block/*; do
 			devpath="/dev/${dev##*/}"
-			if dd if=$devpath bs=1024 count=64 2>/dev/null | strings | grep -qw "slinux-iso"; then
+			if dd if=$devpath bs=1024 count=64 2>/dev/null | strings | grep -qw "SLINUX_ISO"; then
 				sl_log "found livecd root: $devpath"
 				rootdisk=$devpath
 				break
 			fi
 		done
 	done
+	sleep 1
 fi
 
 # mount root
