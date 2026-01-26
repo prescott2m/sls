@@ -5,9 +5,7 @@ hostname $(cat /etc/hostname)
 # horrible idea
 . /etc/os-release
 
-echo "\n --- \e[94m$NAME $VERSION_ID ($(uname -sr))\e[0m --- "
-
-setsid respawn getty /dev/tty1 &
-setsid respawn getty /dev/tty2 &
-setsid respawn getty /dev/tty3 &
-setsid respawn getty /dev/tty4 &
+for i in 1 2 3 4; do
+    echo "\n --- \e[94m$NAME $VERSION_ID ($(uname -sr)) tty$i\e[0m --- " > /dev/tty$i
+    setsid respawn getty /dev/tty$i &
+done
