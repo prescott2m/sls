@@ -7,4 +7,7 @@ hostname $(cat /etc/hostname)
 
 echo "\n --- \e[94m$NAME $VERSION_ID ($(uname -sr))\e[0m --- "
 
-exec respawn getty < /dev/tty1 > /dev/tty1 2>&1
+setsid respawn getty /dev/tty1 &
+setsid respawn getty /dev/tty2 &
+setsid respawn getty /dev/tty3 &
+setsid respawn getty /dev/tty4 &

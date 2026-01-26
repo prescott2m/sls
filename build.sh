@@ -8,7 +8,7 @@ echo "---"
 # make sure dirs exist
 if [ ! -d "$SYSROOT" ]; then
 	sl_log "SYSROOT does not exist, creating"
-	mkdir -p $SYSROOT/{dev,proc,sys}
+	mkdir -p $SYSROOT/{dev,proc,sys,tmp}
 	cp -r tmpl-sysroot/* $SYSROOT
 fi
 

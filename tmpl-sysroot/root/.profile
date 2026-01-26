@@ -3,4 +3,4 @@ if [ "$(id -u)" -eq 0 ]; then
     PROMPT_COLOR="\033[31m"
 fi
 
-export PS1="$PROMPT_COLOR\u [ \033[37m\w $PROMPT_COLOR] \\$ \033[0m"
+export PS1="\[$PROMPT_COLOR\]\u [ \[\033[37m\]\w \[$PROMPT_COLOR\]] \\$ \[\033[0m\]"

@@ -85,6 +85,8 @@ sl_log "move /proc to $ROOT/proc"
 mount -M /proc $ROOT/proc
 sl_log "move /sys to $ROOT/sys"
 mount -M /sys $ROOT/sys
+sl_log "mount $ROOT/tmp"
+mount -t tmpfs tmpfs $ROOT/tmp
 
 # switch_root
 sl_log "running switch_root"
