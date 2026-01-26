@@ -16,12 +16,15 @@ int main(int argc, char* argv[]) {
         case 'p':
             sync();
             reboot(RB_POWER_OFF);
+            break;
         case 'r':
             sync();
             reboot(RB_AUTOBOOT);
+            break;
         default:
             usage(argv[0]);
     }
 
+    perror("reboot");
     return 1;
 }

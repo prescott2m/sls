@@ -175,7 +175,7 @@ if [ ! -d "oksh-$OKSH_VERSION" ]; then
 	sl_log "./oksh-$OKSH_VERSION does not exist, cloning and building"
 	git clone https://github.com/ibara/oksh -b oksh-$OKSH_VERSION oksh-$OKSH_VERSION
 	cd oksh-$OKSH_VERSION
-	./configure --cc=musl-gcc --enable-small --enable-ksh --prefix=/usr
+	./configure --cc=musl-gcc --disable-curses --enable-ksh --prefix=/usr
 	make -j$(nproc)
 	cd $BASE
 fi
