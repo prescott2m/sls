@@ -1,6 +1,7 @@
 linux
 musl*
 dash*
+oksh*
 sbase
 ubase
 sinit
