@@ -6,6 +6,6 @@ hostname $(cat /etc/hostname)
 . /etc/os-release
 
 for i in 1 2 3 4; do
-    echo "\n --- \e[94m$NAME $VERSION_ID ($(uname -sr)) tty$i\e[0m --- " > /dev/tty$i
+    echo "\n --- \e[94m$NAME ($(uname -sr)) tty$i\e[0m --- " > /dev/tty$i
     setsid respawn getty /dev/tty$i &
 done
