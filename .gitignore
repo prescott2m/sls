@@ -1,11 +1,16 @@
+# cloned repos
 linux
-musl*
-dash*
-oksh*
+musl
+dash
+oksh
 sbase
 ubase
 sinit
+
+# slinux-specific programs
+rc.shutdown/rc.shutdown
+
+# build outputs
 sysroot
 initrd
 slinux.iso
-rc.shutdown/rc.shutdown

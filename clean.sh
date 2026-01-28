@@ -3,9 +3,9 @@
 . config.sh
 
 if [[ $1 == "all" ]]; then
-	rm -rf linux musl-$MUSL_VERSION* dash-$DASH_VERSION* oksh-$OKSH_VERSION* sbase ubase sinit rc.shutdown/rc.shutdown sysroot initrd slinux.iso
+	rm -rf linux musl dash oksh sbase ubase sinit rc.shutdown/rc.shutdown sysroot initrd slinux.iso
 elif [[ $1 == "userland" ]]; then
-	rm -rf musl-$MUSL_VERSION* dash-$DASH_VERSION* oksh-$OKSH_VERSION* sbase ubase sinit rc.shutdown/rc.shutdown sysroot initrd slinux.iso
+	rm -rf musl dash oksh sbase ubase sinit rc.shutdown/rc.shutdown sysroot initrd slinux.iso
 elif [[ $1 == "initrd" ]]; then
 	rm -rf initrd sysroot/boot/initramfs.cpio.gz slinux.iso
 elif [[ $1 == "fs" ]]; then

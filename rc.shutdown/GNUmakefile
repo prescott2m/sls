@@ -1,6 +1,6 @@
 PREFIX  = /usr
 CC      = musl-gcc
-CFLAGS  = -Wextra -Wall -Os
+CFLAGS  = -Wextra -Wall -Os -std=c99 -D_XOPEN_SOURCE=700
 LDFLAGS = -s
 BIN     = rc.shutdown
 SRC     = main.c
@@ -8,7 +8,7 @@ SRC     = main.c
 all: $(BIN)
 
 $(BIN):
-	$(CC) $(LDFLAGS) -o $@ $(SRC) $(LDLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRC) $(LDLIBS)
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin

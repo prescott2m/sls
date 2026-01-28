@@ -21,11 +21,11 @@ fi
 # linux
 if [ ! -d "linux" ]; then
 	sl_log "./linux does not exist, cloning and building"
-	git clone https://github.com/torvalds/linux -j$(nproc) --depth=1
+	git clone https://github.com/torvalds/linux --depth 1
 	cd linux
 	make defconfig
 	patch .config ../linux-config.patch
-	make -j$(nproc)
+	make -j$BUILD_JOBS
 	cd $BASE
 fi
 
@@ -35,13 +35,12 @@ if [ ! -f "$SYSROOT/boot/bzImage" ]; then
 fi
 
 # musl
-if [ ! -d "musl-$MUSL_VERSION" ]; then
-	sl_log "./musl-$MUSL_VERSION does not exist, cloning and building"
-	wget https://musl.libc.org/releases/musl-$MUSL_VERSION.tar.gz
-	tar -xzvf musl-$MUSL_VERSION.tar.gz
-	cd musl-$MUSL_VERSION
+if [ ! -d "musl" ]; then
+	sl_log "./musl does not exist, cloning and building"
+	git clone git://git.musl-libc.org/musl --depth 1
+	cd musl
 	./configure --prefix=/usr --syslibdir=/lib
-	make -j$(nproc)
+	make -j$BUILD_JOBS
 	DESTDIR=$SYSROOT make install
 	DESTDIR=$INITRD make install
 	cd $BASE
@@ -49,14 +48,14 @@ fi
 
 if [ ! -L "$SYSROOT/lib/ld-musl-x86_64.so.1" ]; then
 	sl_log "SYSROOT/lib/ld-musl-x86_64.so.1 does not exist, installing"
-	cd musl-$MUSL_VERSION
+	cd musl
 	DESTDIR=$SYSROOT make install
 	cd $BASE
 fi
 
 if [ ! -L "$INITRD/lib/ld-musl-x86_64.so.1" ]; then
 	sl_log "INITRD/lib/ld-musl-x86_64.so.1 does not exist, installing"
-	cd musl-$MUSL_VERSION
+	cd musl
 	DESTDIR=$INITRD make install
 	cd $BASE
 
@@ -67,10 +66,10 @@ fi
 # sbase
 if [ ! -d "sbase" ]; then
 	sl_log "./sbase does not exist, cloning and building"
-	git clone git://git.suckless.org/sbase -j$(nproc) --depth 1
+	git clone git://git.suckless.org/sbase --depth 1
 	cp sbase-config.mk sbase/config.mk
 	cd sbase
-	make -j$(nproc)
+	make -j$BUILD_JOBS
 	cd $BASE
 fi
 
@@ -93,10 +92,10 @@ fi
 # ubase
 if [ ! -d "ubase" ]; then
 	sl_log "./ubase does not exist, cloning and building"
-	git clone git://git.suckless.org/ubase -j$(nproc) --depth 1
+	git clone git://git.suckless.org/ubase --depth 1
 	cp ubase-config.mk ubase/config.mk
 	cd ubase
-	make -j$(nproc)
+	make -j$BUILD_JOBS
 	cd $BASE
 fi
 
@@ -119,7 +118,7 @@ fi
 # sinit
 if [ ! -d "sinit" ]; then
 	sl_log "./sinit does not exist, cloning and building"
-	git clone git://git.suckless.org/sinit -j$(nproc) --depth 1
+	git clone git://git.suckless.org/sinit --depth 1
 	cp sinit-config.mk sinit/config.mk
 	cd sinit
 	make
@@ -149,40 +148,39 @@ if [ ! -f "$SYSROOT/usr/bin/rc.shutdown" ]; then
 fi
 
 # dash
-if [ ! -d "dash-$DASH_VERSION" ]; then
-	sl_log "./dash-$DASH_VERSION does not exist, cloning and building"
-	wget https://git.kernel.org/pub/scm/utils/dash/dash.git/snapshot/dash-$DASH_VERSION.tar.gz
-	tar -xzvf dash-$DASH_VERSION.tar.gz
-	cd dash-$DASH_VERSION
+if [ ! -d "dash" ]; then
+	sl_log "./dash does not exist, cloning and building"
+	git clone git://git.kernel.org/pub/scm/utils/dash/dash.git --depth 1
+	cd dash
 	./autogen.sh
 	./configure --host=$TARGET_TUPLE
-	make -j$(nproc)
+	make -j$BUILD_JOBS
 	cd $BASE
 fi
 
 if [ ! -f "$SYSROOT/usr/bin/sh" ]; then
 	sl_log "SYSROOT/usr/bin/sh does not exist, copying dash"
-	cp -v dash-$DASH_VERSION/src/dash $SYSROOT/usr/bin/sh
+	cp -v dash/src/dash $SYSROOT/usr/bin/sh
 fi
 
 if [ ! -f "$INITRD/usr/bin/sh" ]; then
 	sl_log "INITRD/usr/bin/sh does not exist, copying dash"
-	cp -v dash-$DASH_VERSION/src/dash $INITRD/usr/bin/sh
+	cp -v dash/src/dash $INITRD/usr/bin/sh
 fi
 
 # oksh
-if [ ! -d "oksh-$OKSH_VERSION" ]; then
-	sl_log "./oksh-$OKSH_VERSION does not exist, cloning and building"
-	git clone https://github.com/ibara/oksh -b oksh-$OKSH_VERSION oksh-$OKSH_VERSION
-	cd oksh-$OKSH_VERSION
+if [ ! -d "oksh" ]; then
+	sl_log "./oksh does not exist, cloning and building"
+	git clone https://github.com/ibara/oksh oksh
+	cd oksh
 	./configure --cc=musl-gcc --disable-curses --enable-ksh --prefix=/usr
-	make -j$(nproc)
+	make -j$BUILD_JOBS
 	cd $BASE
 fi
 
 if [ ! -f "$SYSROOT/usr/bin/ksh" ]; then
 	sl_log "SYSROOT/usr/bin/ksh does not exist, installing"
-	cd oksh-$OKSH_VERSION
+	cd oksh
 	make install DESTDIR=$SYSROOT
 	cd $BASE
 fi
