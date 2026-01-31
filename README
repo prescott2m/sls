@@ -1,0 +1,40 @@
+sls
+===
+sls is a basic Linux distro using musl, sbase, ubase, and sinit.
+
+Base system
+-----------
+The base system (sls.iso) includes:
+
+- linux
+- musl libc
+- sbase
+- ubase
+- sinit
+- dash
+- oksh
+
+Requirements
+------------
+In order to build sls you need:
+
+- GNU Bash
+- GNU Make
+- musl-gcc
+- git
+- autoconf
+- grub-mkrescue
+
+Building
+--------
+To build sls and create an sls.iso, run build.sh.
+
+Configuration
+-------------
+To configure sls, edit config.sh.
+
+Hacking
+-------
+
+When writing C specifically for sls (e.g. rc.shutdown), use
+https://suckless.org/coding_style/ as your style guide.

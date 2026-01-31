@@ -45,7 +45,7 @@ if grep -qw live /proc/cmdline; then
 	while [ -z "${rootdisk:-}" ]; do
 		for dev in /sys/class/block/*; do
 			devpath="/dev/${dev##*/}"
-			if dd if=$devpath bs=1024 count=64 2>/dev/null | strings | grep -qw "SLINUX_ISO"; then
+			if dd if=$devpath bs=1024 count=64 2>/dev/null | strings | grep -qw "SLS_LINUX_ISO"; then
 				sl_log "found livecd root: $devpath"
 				rootdisk=$devpath
 				break

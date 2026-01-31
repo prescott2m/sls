@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ue
 
 . config.sh
 
@@ -24,7 +24,7 @@ if [ ! -d "linux" ]; then
 	git clone https://github.com/torvalds/linux --depth 1
 	cd linux
 	make defconfig
-	patch .config ../linux-config.patch
+	patch .config $BASE/linux-config.diff
 	make -j$BUILD_JOBS
 	cd $BASE
 fi
@@ -200,9 +200,9 @@ if [ ! -f "$SYSROOT/boot/initramfs.cpio.gz" ]; then
 fi
 
 # boot media
-if [ ! -f "slinux.iso" ]; then
-	sl_log "slinux.iso does not exist, creating"
-	grub-mkrescue -o slinux.iso sysroot/ -- -volid SLINUX_ISO
+if [ ! -f "sls.iso" ]; then
+	sl_log "sls.iso does not exist, creating"
+	grub-mkrescue -o sls.iso sysroot/ -- -volid SLS_LINUX_ISO
 fi
 
 

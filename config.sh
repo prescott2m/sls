@@ -14,7 +14,7 @@ sl_log() {
 
 # vars
 sl_var TARGET_TUPLE x86_64-linux-musl
-sl_var SYSROOT "$(pwd)/sysroot"
-sl_var INITRD "$(pwd)/initrd"
 sl_var BASE "$(pwd)"
+sl_var SYSROOT "$BASE/sysroot"
+sl_var INITRD "$BASE/initrd"
 sl_var BUILD_JOBS $(nproc)
