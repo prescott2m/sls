@@ -35,6 +35,5 @@ To configure sls, edit config.sh.
 
 Hacking
 -------
-
 When writing C specifically for sls (e.g. rc.shutdown), use
 https://suckless.org/coding_style/ as your style guide.

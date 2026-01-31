@@ -13,4 +13,4 @@ rc.shutdown/rc.shutdown
 # build outputs
 sysroot
 initrd
-slinux.iso
+sls.iso
