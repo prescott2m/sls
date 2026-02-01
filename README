@@ -20,7 +20,7 @@ In order to build sls you need:
 
 - GNU Bash
 - GNU Make
-- musl-gcc
+- gcc
 - git
 - autoconf
 - grub-mkrescue

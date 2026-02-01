@@ -6,7 +6,7 @@ PREFIX = /usr
 MANPREFIX = $(PREFIX)/share/man
 
 # tools
-CC = musl-gcc
+CC = $(TARGET_TUPLE)-gcc
 #AR =
 RANLIB = ranlib
 # OpenBSD requires SMAKE to be scripts/make

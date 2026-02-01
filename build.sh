@@ -34,12 +34,23 @@ if [ ! -f "$SYSROOT/boot/bzImage" ]; then
 	cp -v linux/arch/x86/boot/bzImage $SYSROOT/boot/bzImage
 fi
 
+# cross compiler
+if [ ! -d "musl-cross-make" ]; then
+	sl_log "./musl-cross-make does not exist, cloning and building"
+	git clone https://github.com/richfelker/musl-cross-make --depth 1
+	cd musl-cross-make
+    cp $BASE/musl-cross-make-config.mk config.mak
+	make
+    make install
+	cd $BASE
+fi
+
 # musl
 if [ ! -d "musl" ]; then
 	sl_log "./musl does not exist, cloning and building"
 	git clone git://git.musl-libc.org/musl --depth 1
 	cd musl
-	./configure --prefix=/usr --syslibdir=/lib
+	./configure --host=$TARGET_TUPLE --prefix=/usr --syslibdir=/lib
 	make -j$BUILD_JOBS
 	DESTDIR=$SYSROOT make install
 	DESTDIR=$INITRD make install
@@ -153,7 +164,7 @@ if [ ! -d "dash" ]; then
 	git clone git://git.kernel.org/pub/scm/utils/dash/dash.git --depth 1
 	cd dash
 	./autogen.sh
-	./configure --host=$TARGET_TUPLE
+	./configure $AUTOTOOLS_CONFIGURE_FLAGS
 	make -j$BUILD_JOBS
 	cd $BASE
 fi
@@ -173,7 +184,7 @@ if [ ! -d "oksh" ]; then
 	sl_log "./oksh does not exist, cloning and building"
 	git clone https://github.com/ibara/oksh oksh
 	cd oksh
-	./configure --cc=musl-gcc --disable-curses --enable-ksh --prefix=/usr
+	./configure --cc=$TARGET_TUPLE-gcc --disable-curses --enable-ksh --prefix=/usr
 	make -j$BUILD_JOBS
 	cd $BASE
 fi

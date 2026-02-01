@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ue
 
 # helpers
 sl_var() {
@@ -15,6 +15,10 @@ sl_log() {
 # vars
 sl_var TARGET_TUPLE x86_64-linux-musl
 sl_var BASE "$(pwd)"
+sl_var CROSS "$BASE/cross"
 sl_var SYSROOT "$BASE/sysroot"
 sl_var INITRD "$BASE/initrd"
 sl_var BUILD_JOBS $(nproc)
+sl_var AUTOTOOLS_CONFIGURE_FLAGS "--host=$TARGET_TUPLE CC=$TARGET_TUPLE-gcc CXX=$TARGET_TUPLE-g++ AR=$TARGET_TUPLE-ar RANLIB=$TARGET_TUPLE-ranlib STRIP=$TARGET_TUPLE-strip"
+
+sl_var PATH "$CROSS/bin:$PATH"

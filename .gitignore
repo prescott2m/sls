@@ -1,4 +1,5 @@
 # cloned repos
+musl-cross-make
 linux
 musl
 dash
@@ -11,6 +12,7 @@ sinit
 rc.shutdown/rc.shutdown
 
 # build outputs
+cross
 sysroot
 initrd
 sls.iso

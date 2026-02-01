@@ -5,7 +5,7 @@ VERSION = 1.1
 PREFIX = /
 MANPREFIX = /usr/share/man
 
-CC = musl-gcc
+CC = $(TARGET_TUPLE)-gcc
 LD = $(CC)
 
 CPPFLAGS =
