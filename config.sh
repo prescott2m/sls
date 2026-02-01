@@ -1,24 +1,24 @@
-#!/bin/bash
+#!/bin/sh
 set -ue
 
 # helpers
-sl_var() {
-  printf -v "$1" '%s' "$2"
-  export "$1"
-  printf '%s=\e[94m%s\e[0m\n' "$1" "${!1}"
+sls_var() {
+    eval "$1=\"\$2\""
+    export "$1"
+    eval "val=\$$1"
+    printf '%s=\e[94m%s\e[0m\n' "$1" "$val"
 }
 
-sl_log() {
-	echo -e "- \e[94m$*\e[0m"
+sls_log() {
+    printf -- "- \e[94m$*\e[0m\n"
 }
 
 # vars
-sl_var TARGET_TUPLE x86_64-linux-musl
-sl_var BASE "$(pwd)"
-sl_var CROSS "$BASE/cross"
-sl_var SYSROOT "$BASE/sysroot"
-sl_var INITRD "$BASE/initrd"
-sl_var BUILD_JOBS $(nproc)
-sl_var AUTOTOOLS_CONFIGURE_FLAGS "--host=$TARGET_TUPLE CC=$TARGET_TUPLE-gcc CXX=$TARGET_TUPLE-g++ AR=$TARGET_TUPLE-ar RANLIB=$TARGET_TUPLE-ranlib STRIP=$TARGET_TUPLE-strip"
-
-sl_var PATH "$CROSS/bin:$PATH"
+sls_var TARGET_TUPLE x86_64-linux-musl
+sls_var BASE "$(pwd)"
+sls_var CROSS "$BASE/cross"
+sls_var SYSROOT "$BASE/sysroot"
+sls_var INITRD "$BASE/initrd"
+sls_var BUILD_JOBS $(nproc)
+sls_var AUTOTOOLS_CONFIGURE_FLAGS "--host=$TARGET_TUPLE CC=$TARGET_TUPLE-gcc CXX=$TARGET_TUPLE-g++ AR=$TARGET_TUPLE-ar RANLIB=$TARGET_TUPLE-ranlib STRIP=$TARGET_TUPLE-strip"
+sls_var PATH "$CROSS/bin:$PATH"

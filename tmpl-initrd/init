@@ -1,15 +1,15 @@
 #!/bin/sh
 echo "initrd: alive"
 
-sl_log() {
-	echo "- \e[94m$*\e[0m"
+sls_log() {
+	printf -- "- \e[94m$*\e[0m\n"
 }
 
 cleanup() {
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-		echo "- \e[91mcommand failed with status $exit_code\e[0m"
-		sl_log "dropping into emergency shell"
+		printf -- "- \e[91mcommand failed with status $exit_code\e[0m"
+		sls_log "dropping into emergency shell"
         exec /bin/sh -i
     fi
 }
@@ -18,11 +18,11 @@ trap cleanup EXIT
 set -ue
 
 # mounts
-sl_log "mount /dev"
+sls_log "mount /dev"
 mount -t devtmpfs none /dev
-sl_log "mount /proc"
+sls_log "mount /proc"
 mount -t proc proc /proc
-sl_log "mount /sys"
+sls_log "mount /sys"
 mount -t sysfs sysfs /sys
 
 # read params
@@ -46,7 +46,7 @@ if grep -qw live /proc/cmdline; then
 		for dev in /sys/class/block/*; do
 			devpath="/dev/${dev##*/}"
 			if dd if=$devpath bs=1024 count=64 2>/dev/null | strings | grep -qw "SLS_LINUX_ISO"; then
-				sl_log "found livecd root: $devpath"
+				sls_log "found livecd root: $devpath"
 				rootdisk=$devpath
 				break
 			fi
@@ -56,38 +56,38 @@ if grep -qw live /proc/cmdline; then
 fi
 
 # mount root
-sl_log "mount /mnt"
+sls_log "mount /mnt"
 mount -t ${rootfstype:-iso9660} -o ro ${rootdisk:-/dev/sr0} /mnt
 
 if grep -qw ro /proc/cmdline; then
 	# read-only disk, use /tmp
 	ROOT="/tmp"
 
-	sl_log "mount $ROOT"
+	sls_log "mount $ROOT"
 	mount -t tmpfs tmpfs $ROOT
 
-	sl_log "copy root to $ROOT"
+	sls_log "copy root to $ROOT"
 	cd /mnt && tar cf - . | (cd /tmp && tar xpf -) && cd /
 
-	sl_log "unmount /mnt"
+	sls_log "unmount /mnt"
 	umount /mnt
 else
 	# read-write, use the actual disk
 	ROOT="/mnt"
-	sl_log "remount /mnt as rw"
+	sls_log "remount /mnt as rw"
 	mount -o remount,rw /mnt
 fi
 
 # move mountpoints
-sl_log "move /dev to $ROOT/dev"
+sls_log "move /dev to $ROOT/dev"
 mount -M /dev $ROOT/dev
-sl_log "move /proc to $ROOT/proc"
+sls_log "move /proc to $ROOT/proc"
 mount -M /proc $ROOT/proc
-sl_log "move /sys to $ROOT/sys"
+sls_log "move /sys to $ROOT/sys"
 mount -M /sys $ROOT/sys
-sl_log "mount $ROOT/tmp"
+sls_log "mount $ROOT/tmp"
 mount -t tmpfs tmpfs $ROOT/tmp
 
 # switch_root
-sl_log "running switch_root"
+sls_log "running switch_root"
 exec switch_root $ROOT ${init:-/bin/sinit}

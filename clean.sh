@@ -1,23 +1,39 @@
-#!/bin/bash
+#!/bin/sh
 set -ue
 
-. config.sh
+. ./config.sh
 
-if [[ $1 == "all" ]]; then
-	rm -rf linux musl dash oksh sbase ubase sinit rc.shutdown/rc.shutdown sysroot initrd sls.iso
-elif [[ $1 == "userland" ]]; then
-	rm -rf musl dash oksh sbase ubase sinit rc.shutdown/rc.shutdown sysroot initrd sls.iso
-elif [[ $1 == "initrd" ]]; then
-	rm -rf initrd sysroot/boot/initramfs.cpio.gz sls.iso
-elif [[ $1 == "fs" ]]; then
-	rm -rf sysroot initrd sls.iso
-else
-	echo "help:"
-	echo "./clean.sh all - deletes sysroot, initrd, sls.iso, and cloned repos"
-	echo "./clean.sh userland - deletes sysroot, initrd, sls.iso, and cloned repos (except linux)"
-	echo "./clean.sh initrd - deletes initrd and sls.iso"
-	echo "./clean.sh fs  - deletes sysroot, initrd, and sls.iso"
-	exit 2
+echo "--- $0"
+
+usage() {
+    echo "usage: $0 [-isulc]"
+    echo " -: sls.iso"
+    echo " i: initrd"
+    echo " s: sysroot"
+    echo " u: cloned repos (except for linux and musl-cross-make)"
+    echo " l: linux kernel"
+    echo " c: cross compiler"
+    exit 2
+}
+
+targets="sls.iso"
+
+if [ "$#" = "0" ]; then
+    usage
 fi
 
+while getopts "isulc" opt; do
+    case "$opt" in
+    i) targets="$targets $INITRD $SYSROOT/boot/initramfs.cpio.gz" ;; # initrd
+    s) targets="$targets $SYSROOT" ;; # sysroot
+    u) targets="$targets musl dash oksh sbase ubase sinit rc.shutdown/rc.shutdown" ;; # userland
+    l) targets="$targets linux $SYSROOT/boot/bzImage" ;; # linux
+    c) targets="$targets $CROSS musl-cross-make" ;; # cross
+    *) usage ;;
+    esac
+done
 
+if [ -n "$targets" ]; then
+	printf "REMOVING: \e[91m$targets\e[0m\n"
+	rm -rf $targets
+fi

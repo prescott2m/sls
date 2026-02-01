@@ -18,7 +18,7 @@ Requirements
 ------------
 In order to build sls you need:
 
-- GNU Bash
+- POSIX sh
 - GNU Make
 - gcc
 - git
