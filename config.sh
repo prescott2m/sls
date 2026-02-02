@@ -16,9 +16,10 @@ sls_log() {
 # vars
 sls_var TARGET_TUPLE x86_64-linux-musl
 sls_var BASE "$(pwd)"
+sls_var PKGS "$BASE/pkgs"
 sls_var CROSS "$BASE/cross"
 sls_var SYSROOT "$BASE/sysroot"
 sls_var INITRD "$BASE/initrd"
 sls_var BUILD_JOBS $(nproc)
-sls_var AUTOTOOLS_CONFIGURE_FLAGS "--host=$TARGET_TUPLE CC=$TARGET_TUPLE-gcc CXX=$TARGET_TUPLE-g++ AR=$TARGET_TUPLE-ar RANLIB=$TARGET_TUPLE-ranlib STRIP=$TARGET_TUPLE-strip"
+sls_var AUTOTOOLS_CONFIGURE_FLAGS "--host=$TARGET_TUPLE --prefix=/usr CC=$TARGET_TUPLE-gcc CXX=$TARGET_TUPLE-g++ AR=$TARGET_TUPLE-ar RANLIB=$TARGET_TUPLE-ranlib STRIP=$TARGET_TUPLE-strip"
 sls_var PATH "$CROSS/bin:$PATH"

@@ -1,18 +1,15 @@
 # cloned repos
 musl-cross-make
-linux
-musl
-dash
-oksh
-sbase
-ubase
-sinit
 
-# slinux-specific programs
-rc.shutdown/rc.shutdown
+# generic
+*.o
+*.zst
+*.sls
 
 # build outputs
 cross
 sysroot
 initrd
 sls.iso
+pkgs/*/sysroot
+pkgs/*/src

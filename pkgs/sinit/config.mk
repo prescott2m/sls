@@ -2,7 +2,7 @@
 VERSION = 1.1
 
 # paths
-PREFIX = /
+PREFIX = /usr
 MANPREFIX = /usr/share/man
 
 CC = $(TARGET_TUPLE)-gcc

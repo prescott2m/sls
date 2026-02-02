@@ -22,188 +22,71 @@ if [ ! -d "$INITRD" ]; then
     cp -r tmpl-initrd/* $INITRD
 fi
 
-# linux
-if [ ! -d "linux" ]; then
-    sls_log "./linux does not exist, cloning and building"
-    git clone https://github.com/torvalds/linux --depth 1
-    cd linux
-    make defconfig
-    patch .config $BASE/linux-config.diff
-    make -j$BUILD_JOBS
-    cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/boot/bzImage" ]; then
-    sls_log "SYSROOT/boot/bzImage does not exist, copying"
-    cp -v linux/arch/x86/boot/bzImage $SYSROOT/boot/bzImage
-fi
-
 # cross compiler
 if [ ! -d "musl-cross-make" ]; then
     sls_log "./musl-cross-make does not exist, cloning and building"
     git clone https://github.com/richfelker/musl-cross-make --depth 1
     cd musl-cross-make
     cp $BASE/musl-cross-make-config.mk config.mak
-    make
+    make # do not use -j$BUILD_JOBS
+    cd $BASE
+fi
+
+if [ ! -d "$CROSS" ]; then
+    sls_log "CROSS does not exist, installing"
+    cd musl-cross-make
     make install
     cd $BASE
 fi
 
-# musl
-if [ ! -d "musl" ]; then
-    sls_log "./musl does not exist, cloning and building"
-    git clone git://git.musl-libc.org/musl --depth 1
-    cd musl
-    ./configure --host=$TARGET_TUPLE --prefix=/usr --syslibdir=/lib
-    make -j$BUILD_JOBS
-    DESTDIR=$SYSROOT make install
-    DESTDIR=$INITRD make install
+# pkgs
+for pkg in $PKGS/*; do
+    sls_var PKG_BASE "$pkg"
+    sls_var PKG_NAME "$(basename $PKG_BASE)"
+    sls_var PKG_SRC "$PKG_BASE/src"
+    sls_var PKG_SYSROOT "$PKG_BASE/sysroot"
+    echo "--- building package $PKG_NAME"
+
+    if [ ! -d "$PKG_SRC" ]; then
+        cd $PKG_BASE
+        $PKG_BASE/build.sh clone
+        cd $PKG_SRC
+        $PKG_BASE/build.sh build
+    fi
+
+    if [ ! -d "$PKG_SYSROOT" ]; then
+        mkdir $PKG_SYSROOT
+        cd $PKG_SRC
+        $PKG_BASE/build.sh install
+        cp $PKG_BASE/$PKG_NAME.deps $PKG_SYSROOT/
+    fi
+
+    if [ ! -f "$PKG_BASE/$PKG_NAME.sls" ]; then
+        cd $PKG_SYSROOT
+        tar --zstd -cf $PKG_BASE/$PKG_NAME.sls .
+    fi
+
     cd $BASE
-fi
+done
 
-if [ ! -L "$SYSROOT/lib/ld-musl-x86_64.so.1" ]; then
-    sls_log "SYSROOT/lib/ld-musl-x86_64.so.1 does not exist, installing"
-    cd musl
-    DESTDIR=$SYSROOT make install
-    cd $BASE
-fi
+# initrd
+for pkg in musl sbase ubase dash; do
+    if [ ! -f "$INITRD/etc/sls/$pkg.files" ]; then
+        DESTDIR=$INITRD ./sls install $PKGS/$pkg/$pkg.sls
+    fi
+done
 
-if [ ! -L "$INITRD/lib/ld-musl-x86_64.so.1" ]; then
-    sls_log "INITRD/lib/ld-musl-x86_64.so.1 does not exist, installing"
-    cd musl
-    DESTDIR=$INITRD make install
-    cd $BASE
-
-    sls_log "nuking compiler and headers from INITRD"
-    rm -rf $INITRD/usr/include $INITRD/usr/bin
-fi
-
-# sbase
-if [ ! -d "sbase" ]; then
-    sls_log "./sbase does not exist, cloning and building"
-    git clone git://git.suckless.org/sbase --depth 1
-    cp sbase-config.mk sbase/config.mk
-    cd sbase
-    make -j$BUILD_JOBS
-    cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/usr/bin/ls" ]; then
-    sls_log "SYSROOT sbase utils do not exist, installing"
-    cd sbase
-    rm -f proto
-    make install DESTDIR=$SYSROOT
-    cd $BASE
-fi
-
-if [ ! -f "$INITRD/usr/bin/ls" ]; then
-    sls_log "INITRD sbase utils do not exist, installing"
-    cd sbase
-    rm -f proto
-    make install DESTDIR=$INITRD
-    cd $BASE
-fi
-
-# ubase
-if [ ! -d "ubase" ]; then
-    sls_log "./ubase does not exist, cloning and building"
-    git clone git://git.suckless.org/ubase --depth 1
-    cp ubase-config.mk ubase/config.mk
-    cd ubase
-    make -j$BUILD_JOBS
-    cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/usr/bin/mount" ]; then
-    sls_log "SYSROOT ubase utils do not exist, installing"
-    cd ubase
-    rm -f proto
-    make install DESTDIR=$SYSROOT
-    cd $BASE
-fi
-
-if [ ! -f "$INITRD/usr/bin/mount" ]; then
-    sls_log "INITRD ubase utils do not exist, installing"
-    cd ubase
-    rm -f proto
-    make install DESTDIR=$INITRD
-    cd $BASE
-fi
-
-# sinit
-if [ ! -d "sinit" ]; then
-    sls_log "./sinit does not exist, cloning and building"
-    git clone git://git.suckless.org/sinit --depth 1
-    cp sinit-config.mk sinit/config.mk
-    cd sinit
-    make
-    cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/usr/bin/sinit" ]; then
-    sls_log "SYSROOT/bin/sinit does not exist, installing"
-    cd sinit
-    make install DESTDIR=$SYSROOT
-    cd $BASE
-fi
-
-# rc.shutdown
-if [ ! -f "rc.shutdown/rc.shutdown" ]; then
-    sls_log "./rc.shutdown/rc.shutdown does not exist, building"
-    cd rc.shutdown
-    make
-    cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/usr/bin/rc.shutdown" ]; then
-    sls_log "SYSROOT/bin/rc.shutdown does not exist, installing"
-    cd rc.shutdown
-    make install DESTDIR=$SYSROOT
-    cd $BASE
-fi
-
-# dash
-if [ ! -d "dash" ]; then
-    sls_log "./dash does not exist, cloning and building"
-    git clone git://git.kernel.org/pub/scm/utils/dash/dash.git --depth 1
-    cd dash
-    ./autogen.sh
-    ./configure $AUTOTOOLS_CONFIGURE_FLAGS
-    make -j$BUILD_JOBS
-    cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/usr/bin/sh" ]; then
-    sls_log "SYSROOT/usr/bin/sh does not exist, copying dash"
-    cp -v dash/src/dash $SYSROOT/usr/bin/sh
-fi
-
-if [ ! -f "$INITRD/usr/bin/sh" ]; then
-    sls_log "INITRD/usr/bin/sh does not exist, copying dash"
-    cp -v dash/src/dash $INITRD/usr/bin/sh
-fi
-
-# oksh
-if [ ! -d "oksh" ]; then
-    sls_log "./oksh does not exist, cloning and building"
-    git clone https://github.com/ibara/oksh oksh
-    cd oksh
-    ./configure --cc=$TARGET_TUPLE-gcc --disable-curses --enable-ksh --prefix=/usr
-    make -j$BUILD_JOBS
-    cd $BASE
-fi
-
-if [ ! -f "$SYSROOT/usr/bin/ksh" ]; then
-    sls_log "SYSROOT/usr/bin/ksh does not exist, installing"
-    cd oksh
-    make install DESTDIR=$SYSROOT
-    cd $BASE
-fi
+# base system
+for pkg in linux musl sbase ubase sinit dash oksh zstd rc.shutdown sls; do
+    if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
+        DESTDIR=$SYSROOT ./sls install $PKGS/$pkg/$pkg.sls
+    fi
+done
 
 # nuke stuff in initrd
-if [ -d "$INITRD/usr/share/man" ]; then
-    sls_log "nuking manpages from INITRD"
-    rm -rf $INITRD/usr/share/man
+if [ -d "$INITRD/usr/share/man" ] || [ -d "$INITRD/usr/include" ]; then
+    sls_log "nuking unnecessary files from INITRD"
+    rm -rf $INITRD/usr/share/man $INITRD/usr/include
 fi
 
 # initramfs

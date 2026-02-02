@@ -1,3 +1,5 @@
+.POSIX:
+
 PREFIX  = /usr
 CC      = $(TARGET_TUPLE)-gcc
 CFLAGS  = -Wextra -Wall -Os -std=c99 -D_XOPEN_SOURCE=700
