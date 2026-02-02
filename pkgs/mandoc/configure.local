@@ -1,0 +1,2 @@
+CC=$TARGET_TUPLE-gcc
+PREFIX="/usr"

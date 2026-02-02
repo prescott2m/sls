@@ -1,0 +1,95 @@
+diff --git a/configure b/configure
+index 5cf4e08..dc10f92 100755
+--- a/configure
++++ b/configure
+@@ -430,7 +430,7 @@ fi
+ [ "${FATAL}" -eq 0 ] || exit 1
+ 
+ # --- LDADD ---
+-LDADD="${LDADD} ${LD_NANOSLEEP} ${LD_RECVMSG} ${LD_OHASH} -lz"
++LDADD="${LDADD} ${LD_NANOSLEEP} ${LD_RECVMSG} ${LD_OHASH}"
+ echo "selected LDADD=\"${LDADD}\"" 1>&2
+ echo "selected LDADD=\"${LDADD}\"" 1>&3
+ echo 1>&3
+diff --git a/read.c b/read.c
+index 5b33edb..b1a0383 100644
+--- a/read.c
++++ b/read.c
+@@ -37,7 +37,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+-#include <zlib.h>
+ 
+ #include "mandoc_aux.h"
+ #include "mandoc.h"
+@@ -435,7 +434,6 @@ static int
+ read_whole_file(struct mparse *curp, int fd, struct buf *fb, int *with_mmap)
+ {
+ 	struct stat	 st;
+-	gzFile		 gz;
+ 	size_t		 off;
+ 	ssize_t		 ssz;
+ 	int		 gzerrnum, retval;
+@@ -465,26 +463,9 @@ read_whole_file(struct mparse *curp, int fd, struct buf *fb, int *with_mmap)
+ 	}
+ 
+ 	if (curp->gzip) {
+-		/*
+-		 * Duplicating the file descriptor is required
+-		 * because we will have to call gzclose(3)
+-		 * to free memory used internally by zlib,
+-		 * but that will also close the file descriptor,
+-		 * which this function must not do.
+-		 */
+-		if ((fd = dup(fd)) == -1) {
+-			mandoc_msg(MANDOCERR_DUP, 0, 0,
+-			    "%s", strerror(errno));
+-			return -1;
+-		}
+-		if ((gz = gzdopen(fd, "rb")) == NULL) {
+-			mandoc_msg(MANDOCERR_GZDOPEN, 0, 0,
+-			    "%s", strerror(errno));
+-			close(fd);
+-			return -1;
+-		}
+-	} else
+-		gz = NULL;
++		mandoc_msg(MANDOCERR_UNSUPP, 0, 0, "gzipped files are unsupported in this mandoc");
++		return -1;
++	}
+ 
+ 	/*
+ 	 * If this isn't a regular file (like, say, stdin), then we must
+@@ -504,29 +485,19 @@ read_whole_file(struct mparse *curp, int fd, struct buf *fb, int *with_mmap)
+ 			}
+ 			resize_buf(fb, 65536);
+ 		}
+-		ssz = curp->gzip ?
+-		    gzread(gz, fb->buf + (int)off, fb->sz - off) :
+-		    read(fd, fb->buf + (int)off, fb->sz - off);
++		ssz = read(fd, fb->buf + (int)off, fb->sz - off);
+ 		if (ssz == 0) {
+ 			fb->sz = off;
+ 			retval = 0;
+ 			break;
+ 		}
+ 		if (ssz == -1) {
+-			if (curp->gzip)
+-				(void)gzerror(gz, &gzerrnum);
+-			mandoc_msg(MANDOCERR_READ, 0, 0, "%s",
+-			    curp->gzip && gzerrnum != Z_ERRNO ?
+-			    zError(gzerrnum) : strerror(errno));
++			mandoc_msg(MANDOCERR_READ, 0, 0, "%s", strerror(errno));
+ 			break;
+ 		}
+ 		off += (size_t)ssz;
+ 	}
+ 
+-	if (curp->gzip && (gzerrnum = gzclose(gz)) != Z_OK)
+-		mandoc_msg(MANDOCERR_GZCLOSE, 0, 0, "%s",
+-		    gzerrnum == Z_ERRNO ? strerror(errno) :
+-		    zError(gzerrnum));
+ 	if (retval == -1) {
+ 		free(fb->buf);
+ 		fb->buf = NULL;

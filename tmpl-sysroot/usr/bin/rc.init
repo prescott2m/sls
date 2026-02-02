@@ -5,6 +5,10 @@ hostname $(cat /etc/hostname)
 # horrible idea
 . /etc/os-release
 
+ln -sf /proc/self/fd/0 /dev/stdin
+ln -sf /proc/self/fd/1 /dev/stdout
+ln -sf /proc/self/fd/2 /dev/stderr
+
 for i in 1 2 3 4; do
     printf -- "\n --- \e[94m$NAME ($(uname -sr)) tty$i\e[0m ---\n" > /dev/tty$i
     setsid respawn getty /dev/tty$i &

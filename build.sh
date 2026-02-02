@@ -77,7 +77,7 @@ for pkg in musl sbase ubase dash; do
 done
 
 # base system
-for pkg in linux musl sbase ubase sinit dash oksh zstd rc.shutdown sls; do
+for pkg in linux musl sbase ubase sinit dash oksh zstd rc.shutdown sls page mandoc; do
     if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
         DESTDIR=$SYSROOT ./sls install $PKGS/$pkg/$pkg.sls
     fi

@@ -13,6 +13,11 @@ The base system (sls.iso) includes:
 - sinit
 - dash
 - oksh
+- mandoc
+- page
+- zstd
+- sls
+- rc.shutdown (just a tiny C program)
 
 Requirements
 ------------
