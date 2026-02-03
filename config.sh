@@ -22,4 +22,7 @@ sls_var SYSROOT "$BASE/sysroot"
 sls_var INITRD "$BASE/initrd"
 sls_var BUILD_JOBS $(nproc)
 sls_var AUTOTOOLS_CONFIGURE_FLAGS "--host=$TARGET_TUPLE --prefix=/usr CC=$TARGET_TUPLE-gcc CXX=$TARGET_TUPLE-g++ AR=$TARGET_TUPLE-ar RANLIB=$TARGET_TUPLE-ranlib STRIP=$TARGET_TUPLE-strip"
+sls_var PRIORITY_PKGS "musl zstd sbase ubase"
 sls_var PATH "$CROSS/bin:$PATH"
+
+sls_var E3_VERSION 2.82+dfsg

@@ -22,7 +22,7 @@ if [ "$#" = "0" ]; then
     usage
 fi
 
-while getopts "isarcp:" opt; do
+while getopts "isacp:" opt; do
     case "$opt" in
     i) targets="$targets $INITRD $SYSROOT/boot/initramfs.cpio.gz" ;; # initrd
     s) targets="$targets $SYSROOT" ;; # sysroot

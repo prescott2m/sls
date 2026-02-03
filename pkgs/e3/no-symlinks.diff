@@ -1,0 +1,39 @@
+diff --git a/Makefile b/Makefile
+index b0d3fcc..60bfdf8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -49,11 +49,6 @@ else
+ 	ld -s -o e3 e3.o
+ 	strip --remove-section .comment e3
+ endif
+-	ln -sf e3 e3ws
+-	ln -sf e3 e3em
+-	ln -sf e3 e3pi
+-	ln -sf e3 e3vi
+-	ln -sf e3 e3ne
+ 
+ # ------------- 64 bit L I N U X ------------------
+ 
+@@ -64,22 +59,12 @@ endif
+ ifneq	($(DEBUG),true)
+ 	strip e3
+ endif
+-	ln -sf e3 e3ws
+-	ln -sf e3 e3em
+-	ln -sf e3 e3pi
+-	ln -sf e3 e3vi
+-	ln -sf e3 e3ne
+ 
+ # -------------------------------------------------
+ 
+ install:	e3
+ 	install -d $(PREFIX) $(BINDIR) $(MANDIR)
+ 	install -m 755 e3 $(BINDIR)
+-	ln -sf $(BINDIR)/e3 $(BINDIR)/e3ws
+-	ln -sf $(BINDIR)/e3 $(BINDIR)/e3em
+-	ln -sf $(BINDIR)/e3 $(BINDIR)/e3pi
+-	ln -sf $(BINDIR)/e3 $(BINDIR)/e3vi
+-	ln -sf $(BINDIR)/e3 $(BINDIR)/e3ne
+ 	install -m 644 e3.man $(MANDIR)/e3.$(MANSEC)
+ 
+ clean:

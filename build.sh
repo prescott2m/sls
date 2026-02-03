@@ -5,6 +5,35 @@ set -ue
 
 echo "--- $0"
 
+build_pkg() {
+    sls_var PKG_BASE "$1"
+    sls_var PKG_NAME "$(basename $PKG_BASE)"
+    sls_var PKG_SRC "$PKG_BASE/src"
+    sls_var PKG_SYSROOT "$PKG_BASE/sysroot"
+    sls_log "building package $PKG_NAME"
+
+    if [ ! -d "$PKG_SRC" ]; then
+        cd $PKG_BASE
+        $PKG_BASE/build.sh clone
+        cd $PKG_SRC
+        $PKG_BASE/build.sh build
+    fi
+
+    if [ ! -d "$PKG_SYSROOT" ]; then
+        mkdir $PKG_SYSROOT
+        cd $PKG_SRC
+        $PKG_BASE/build.sh install
+        cp $PKG_BASE/$PKG_NAME.deps $PKG_SYSROOT/
+    fi
+
+    if [ ! -f "$PKG_BASE/$PKG_NAME.sls" ]; then
+        cd $PKG_SYSROOT
+        tar --zstd -cf $PKG_BASE/$PKG_NAME.sls .
+    fi
+
+    cd $BASE
+}
+
 # make sure dirs exist
 if [ ! -d "$SYSROOT" ]; then
     sls_log "SYSROOT does not exist, creating"
@@ -39,47 +68,34 @@ if [ ! -d "$CROSS" ]; then
     cd $BASE
 fi
 
-# pkgs
+# priority packages first
+for pkg in $PRIORITY_PKGS; do
+    build_pkg "$PKGS/$pkg"
+
+    sls_log "installing $PKG_NAME to SYSROOT"
+    if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
+        DESTDIR=$SYSROOT ./sls install $PKGS/$pkg/$pkg.sls
+    fi
+done
+
+# everything else
 for pkg in $PKGS/*; do
-    sls_var PKG_BASE "$pkg"
-    sls_var PKG_NAME "$(basename $PKG_BASE)"
-    sls_var PKG_SRC "$PKG_BASE/src"
-    sls_var PKG_SYSROOT "$PKG_BASE/sysroot"
-    echo "--- building package $PKG_NAME"
+    PKG_NAME=$(basename $pkg)
+    for x in $PRIORITY_PKGS; do [ "$PKG_NAME" = "$x" ] && continue 2; done
 
-    if [ ! -d "$PKG_SRC" ]; then
-        cd $PKG_BASE
-        $PKG_BASE/build.sh clone
-        cd $PKG_SRC
-        $PKG_BASE/build.sh build
+    build_pkg "$pkg"
+
+    sls_log "installing $PKG_NAME to SYSROOT"
+    if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
+        DESTDIR=$SYSROOT ./sls install $pkg/$PKG_NAME.sls
     fi
-
-    if [ ! -d "$PKG_SYSROOT" ]; then
-        mkdir $PKG_SYSROOT
-        cd $PKG_SRC
-        $PKG_BASE/build.sh install
-        cp $PKG_BASE/$PKG_NAME.deps $PKG_SYSROOT/
-    fi
-
-    if [ ! -f "$PKG_BASE/$PKG_NAME.sls" ]; then
-        cd $PKG_SYSROOT
-        tar --zstd -cf $PKG_BASE/$PKG_NAME.sls .
-    fi
-
-    cd $BASE
 done
 
 # initrd
 for pkg in musl sbase ubase dash; do
+    sls_log "installing $pkg to INITRD"
     if [ ! -f "$INITRD/etc/sls/$pkg.files" ]; then
         DESTDIR=$INITRD ./sls install $PKGS/$pkg/$pkg.sls
-    fi
-done
-
-# base system
-for pkg in linux musl sbase ubase sinit dash oksh zstd rc.shutdown sls page mandoc; do
-    if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
-        DESTDIR=$SYSROOT ./sls install $PKGS/$pkg/$pkg.sls
     fi
 done
 

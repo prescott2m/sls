@@ -18,6 +18,7 @@ The base system (sls.iso) includes:
 - zstd
 - sls
 - rc.shutdown (just a tiny C program)
+- e3 text editor
 
 Requirements
 ------------
@@ -29,6 +30,7 @@ In order to build sls you need:
 - git
 - autoconf
 - grub-mkrescue
+- nasm (for pkgs/e3)
 
 Building
 --------
