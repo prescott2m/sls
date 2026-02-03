@@ -37,7 +37,7 @@ build_pkg() {
 # make sure dirs exist
 if [ ! -d "$SYSROOT" ]; then
     sls_log "SYSROOT does not exist, creating"
-    for dir in dev proc sys tmp; do
+    for dir in dev dev/pts proc sys tmp; do
         mkdir -p "$SYSROOT/$dir"
     done
     cp -r tmpl-sysroot/* $SYSROOT

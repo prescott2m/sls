@@ -7,7 +7,7 @@
 static void
 usage(const char *argv0)
 {
-    printf("usage: %s poweroff|reboot. you must be root\n", argv0);
+    printf("usage: %s <poweroff|reboot>. you must be root\n", argv0);
     exit(2);
 }
 

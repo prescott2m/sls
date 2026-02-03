@@ -87,6 +87,10 @@ sls_log "move /sys to $ROOT/sys"
 mount -M /sys $ROOT/sys
 sls_log "mount $ROOT/tmp"
 mount -t tmpfs tmpfs $ROOT/tmp
+sls_log "mount $ROOT/dev/pts"
+# TODO: figure out why the fuck we have to mkdir here
+mkdir $ROOT/dev/pts
+mount -t devpts devpts $ROOT/dev/pts
 
 # switch_root
 sls_log "running switch_root"
