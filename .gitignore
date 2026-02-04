@@ -5,6 +5,7 @@ musl-cross-make
 *.o
 *.zst
 *.sls
+*.qcow2
 
 # build outputs
 cross
@@ -12,4 +13,5 @@ sysroot
 initrd
 sls.iso
 pkgs/*/sysroot
+pkgs/*/destdir
 pkgs/*/src

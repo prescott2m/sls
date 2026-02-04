@@ -9,8 +9,8 @@ build)
     CC=$TARGET_TUPLE-gcc ./make
     ;;
 install)
-    mkdir -pv $PKG_SYSROOT/usr/bin
-    cp -v $PKG_SRC/fpipe $PKG_SRC/page $PKG_SYSROOT/usr/bin/
+    mkdir -pv $PKG_DESTDIR/usr/bin
+    cp -v $PKG_SRC/fpipe $PKG_SRC/page $PKG_DESTDIR/usr/bin/
     ;;
 *)
     echo "invalid op"

@@ -15,7 +15,7 @@ build)
     make -j$BUILD_JOBS
     ;;
 install)
-    make install DESTDIR=$PKG_SYSROOT
+    make install DESTDIR=$PKG_DESTDIR
     ;;
 *)
     echo "invalid op"

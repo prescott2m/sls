@@ -9,7 +9,7 @@ build)
     make -j$BUILD_JOBS CC=$TARGET_TUPLE-gcc AR=$TARGET_TUPLE-ar
     ;;
 install)
-    make install DESTDIR=$PKG_SYSROOT PREFIX=/usr
+    make install DESTDIR=$PKG_DESTDIR PREFIX=/usr
     ;;
 *)
     echo "invalid op"

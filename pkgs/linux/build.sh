@@ -11,8 +11,11 @@ build)
     make -j$BUILD_JOBS
     ;;
 install)
-    mkdir -pv $PKG_SYSROOT/boot
-    cp -v $PKG_SRC/arch/x86/boot/bzImage $PKG_SYSROOT/boot/bzImage
+    mkdir -pv $PKG_DESTDIR/boot
+    cp -v $PKG_SRC/arch/x86/boot/bzImage $PKG_DESTDIR/boot/bzImage
+    make headers_install \
+        ARCH=x86_64 \
+        INSTALL_HDR_PATH="$PKG_DESTDIR/usr"
     ;;
 *)
     echo "invalid op"

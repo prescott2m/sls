@@ -11,10 +11,10 @@ build)
     make -j$BUILD_JOBS
     ;;
 install)
-    make install DESTDIR=$PKG_SYSROOT
-    cd $PKG_SYSROOT/usr/bin
+    make install DESTDIR=$PKG_DESTDIR
+    cd $PKG_DESTDIR/usr/bin
     ln -svf dash sh
-    cd $PKG_SYSROOT/usr/share/man/man1
+    cd $PKG_DESTDIR/usr/share/man/man1
     ln -svf dash.1 sh.1
     ;;
 *)

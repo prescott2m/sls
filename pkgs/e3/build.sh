@@ -13,8 +13,8 @@ build)
     make 64 # x86_64
     ;;
 install)
-    make install PREFIX=$PKG_SYSROOT/usr MANDIR=$PKG_SYSROOT/usr/share/man/man1
-    cd $PKG_SYSROOT/usr/bin
+    make install PREFIX=$PKG_DESTDIR/usr MANDIR=$PKG_DESTDIR/usr/share/man/man1
+    cd $PKG_DESTDIR/usr/bin
 
     for sym in e3ws e3em e3pi e3vi e3ne; do
         ln -sf e3 $sym

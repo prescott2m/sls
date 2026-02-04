@@ -8,8 +8,8 @@ clone)
 build)
     ;;
 install)
-    mkdir -pv $PKG_SYSROOT/usr/bin
-    cp -v $BASE/sls $PKG_SYSROOT/usr/bin/sls
+    mkdir -pv $PKG_DESTDIR/usr/bin
+    cp -v $BASE/sls $PKG_DESTDIR/usr/bin/sls
     ;;
 *)
     echo "invalid op"

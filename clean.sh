@@ -26,9 +26,9 @@ while getopts "isacp:" opt; do
     case "$opt" in
     i) targets="$targets $INITRD $SYSROOT/boot/initramfs.cpio.gz" ;; # initrd
     s) targets="$targets $SYSROOT" ;; # sysroot
-    a) targets="$targets $PKGS/*/src $PKGS/*/sysroot $PKGS/*/*.sls" ;; # all pkgs
+    a) targets="$targets $PKGS/*/src $PKGS/*/sysroot $PKGS/*/destdir $PKGS/*/*.sls" ;; # all pkgs
     c) targets="$targets $CROSS musl-cross-make" ;; # cross
-    p) targets="$targets $PKGS/$OPTARG/src $PKGS/$OPTARG/sysroot $PKGS/$OPTARG/$OPTARG.sls" ;; # just one pkg
+    p) targets="$targets $PKGS/$OPTARG/src $PKGS/$OPTARG/sysroot $PKGS/$OPTARG/destdir $PKGS/$OPTARG/$OPTARG.sls" ;; # just one pkg
     *) usage ;;
     esac
 done

@@ -33,7 +33,7 @@ In order to build sls you need:
 - git
 - autoconf
 - grub-mkrescue
-- nasm (for pkgs/e3)
+- nasm (for e3)
 
 Building
 --------
