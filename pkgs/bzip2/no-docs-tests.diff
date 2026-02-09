@@ -1,0 +1,10 @@
+diff --git a/meson.build b/meson.build
+index 756d71e..70c8490 100644
+--- a/meson.build
++++ b/meson.build
+@@ -173,5 +173,3 @@ pkg.generate(
+ install_headers('bzlib.h')
+ 
+ subdir('man')
+-subdir('docs')
+-subdir('tests')

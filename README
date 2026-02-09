@@ -15,7 +15,7 @@ The base system (sls.iso) includes:
 - oksh
 - mandoc
 - page
-- zstd
+- bzip2
 - sls
 - rc.shutdown (just a tiny C program)
 - e3 text editor
@@ -27,13 +27,23 @@ Requirements
 ------------
 In order to build sls you need:
 
+- bzip2
 - POSIX sh
 - GNU Make
 - gcc
+- g++
 - git
 - autoconf
+- automake
+- flex
+- bison
+- elfutils-dev / libelf-dev
+- libressl-dev / openssl-dev
+- xorriso
+- mtools
 - grub-mkrescue
-- nasm (for e3)
+- nasm
+- patch
 
 Building
 --------

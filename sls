@@ -59,7 +59,7 @@ install)
     SLS_PKG_NAME="$(basename $(basename $SLS_PKG) .sls)"
     SLS_TAR_FILE="/tmp/$SLS_PKG_NAME.tar"
 
-    zstd -dfc -o $SLS_TAR_FILE -- "$SLS_PKG"
+    bzip2 -dfc -- "$SLS_PKG" > $SLS_TAR_FILE
     tar -C "$SLS_DEST/etc/sls" -xf $SLS_TAR_FILE ./$SLS_PKG_NAME.deps
 
     if [ "${NODEPERR-}" = "" ]; then
@@ -74,6 +74,7 @@ install)
 
     tar -xvf $SLS_TAR_FILE --no-same-owner --no-same-permissions --exclude="$SLS_PKG_NAME.deps"
     tar -tf $SLS_TAR_FILE | grep -v '/$' | grep -v "$SLS_PKG_NAME.deps" > "$SLS_DEST/etc/sls/$SLS_PKG_NAME.files"
+    rm $SLS_TAR_FILE
     ;;
 remove)
     if [ ! -f "$SLS_DEST/etc/sls/$2.files" ]; then sls_err "$2: requested package doesn't exist"; fi

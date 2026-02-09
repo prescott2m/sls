@@ -27,7 +27,7 @@ build_pkg() {
                 DESTDIR=$PKG_SYSROOT $BASE/sls install "$PKGS/$line/$line.sls"
             done < "$PKG_BASE/$PKG_NAME.build.deps"
         fi
-
+        
         cd $PKG_SRC
         $PKG_BASE/build.sh build
     fi
@@ -41,7 +41,7 @@ build_pkg() {
 
     if [ ! -f "$PKG_BASE/$PKG_NAME.sls" ]; then
         cd $PKG_DESTDIR
-        tar --zstd -cf $PKG_BASE/$PKG_NAME.sls .
+        tar -cjf $PKG_BASE/$PKG_NAME.sls .
     fi
 
     cd $BASE
@@ -81,22 +81,9 @@ if [ ! -d "$CROSS" ]; then
     cd $BASE
 fi
 
-# priority packages first
-for pkg in $PRIORITY_PKGS; do
-    if [ ! -f "$PKGS/$pkg/$pkg.sls" ]; then
-        build_pkg "$PKGS/$pkg"
-    fi
-
-    sls_log "installing $pkg to SYSROOT"
-    if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
-        DESTDIR=$SYSROOT ./sls install $PKGS/$pkg/$pkg.sls
-    fi
-done
-
-# everything else
+# packages
 for pkg in $PKGS/*; do
     PKG_NAME=$(basename $pkg)
-    for x in $PRIORITY_PKGS; do [ "$PKG_NAME" = "$x" ] && continue 2; done
 
     if [ ! -f "$pkg/$PKG_NAME.sls" ]; then
         build_pkg "$pkg"
@@ -104,7 +91,7 @@ for pkg in $PKGS/*; do
 
     sls_log "installing $PKG_NAME to SYSROOT"
     if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
-        DESTDIR=$SYSROOT ./sls install $pkg/$PKG_NAME.sls
+        DESTDIR=$SYSROOT NODEPERR=1 $BASE/sls install $pkg/$PKG_NAME.sls
     fi
 done
 
