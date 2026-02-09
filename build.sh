@@ -90,7 +90,7 @@ for pkg in $PKGS/*; do
     fi
 
     sls_log "installing $PKG_NAME to SYSROOT"
-    if [ ! -f "$SYSROOT/etc/sls/$pkg.files" ]; then
+    if [ ! -f "$SYSROOT/etc/sls/$PKG_NAME.files" ]; then
         DESTDIR=$SYSROOT NODEPERR=1 $BASE/sls install $pkg/$PKG_NAME.sls
     fi
 done

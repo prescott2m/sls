@@ -72,7 +72,7 @@ install)
         done < "$SLS_DEST/etc/sls/$SLS_PKG_NAME.deps"
     fi
 
-    tar -xvf $SLS_TAR_FILE --no-same-owner --no-same-permissions --exclude="$SLS_PKG_NAME.deps"
+    tar -xvf $SLS_TAR_FILE --no-same-owner --no-same-permissions --exclude="./$SLS_PKG_NAME.deps"
     tar -tf $SLS_TAR_FILE | grep -v '/$' | grep -v "$SLS_PKG_NAME.deps" > "$SLS_DEST/etc/sls/$SLS_PKG_NAME.files"
     rm $SLS_TAR_FILE
     ;;
